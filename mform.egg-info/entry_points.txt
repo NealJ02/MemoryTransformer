@@ -1,0 +1,2 @@
+[console_scripts]
+mform = mform.cli:main
