@@ -10,8 +10,10 @@ mform.egg-info/requires.txt
 mform.egg-info/top_level.txt
 mform/configs/__init__.py
 mform/configs/cli_config.py
+mform/data/dataset.py
 mform/model/__init__.py
 mform/model/attention.py
+mform/model/ema_memory.py
 mform/model/feed_forward.py
 mform/model/memory_transformer.py
 mform/model/normalization.py
