@@ -36,5 +36,3 @@ mform/
 # run full mform training pipeline
 uv run mform mem-transform
 ```
-
-## Results
