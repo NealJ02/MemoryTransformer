@@ -121,11 +121,7 @@ class MemoryTransformer(nn.Module):
         pos_embeds = self.pos_emb(torch.arange(seq_len, device=in_idx.device))
         x = self.drop_emb(tok_embeds + pos_embeds)
 
-        # Optional: Inject memory before transformer layers
-        if self.use_memory and memory_state is not None:
-            x = self.inject_memory(x, memory_state)
-
-        # Transformer layers
+        # Transformer layers (memory will be injected after, not before)
         x = self.trf_blocks(x)
 
         # Update memory after final layer

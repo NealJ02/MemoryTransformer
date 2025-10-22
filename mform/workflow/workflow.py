@@ -27,23 +27,25 @@ class MemoryTransformerWorkflow:
             "emb_dim": 256,        # Reduced from 768 for smaller model
             "n_heads": 8,          # Reduced from 12
             "n_layers": 4,         # Reduced from 12 for faster training
-            "drop_rate": 0.1,      # Dropout rate
+            "drop_rate": 0.3,      # Dropout rate (increased to prevent overfitting)
             "qkv_bias": False,     # Query-key-value bias
             # TinyStories dataset config
-            "train_samples": 3000,  # Number of training stories
+            "train_samples": 5000,  # Number of training stories (increased to prevent overfitting)
             "val_samples": 300,     # Number of validation stories
             # Memory config
             "use_memory": True,    # Enable memory
-            "memory_alpha": 0.9,   # EMA decay (higher = more past influence)
+            "memory_alpha": 0.5,   # EMA decay (reduced to prevent feedback loops)
             "learnable_alpha": False,     # Fixed alpha for now
-            "memory_aggregation": "mean", # mean/max/last
-            "memory_injection": "additive", # additive/gated/concat
-            "num_epochs": 10,
+            "memory_aggregation": "last", # Using last token instead of mean
+            "memory_injection": "gated", # Gated injection lets model learn when to use memory
+            "num_epochs": 20,
             "eval_freq": 100,
             "eval_iter": 5,
             "start_context": "Once upon a time",
             "batch_size": 4,
             "num_stories": 10,
+            "learning_rate": 0.0004,
+            "weight_decay": 0.3,
         }
 
     def train_model_simple(self, model: MemoryTransformer, train_loader: torch.utils.data.DataLoader, val_loader: torch.utils.data.DataLoader, optimizer: torch.optim.Optimizer, device: torch.device, num_epochs: int,
@@ -132,9 +134,8 @@ class MemoryTransformerWorkflow:
 
         torch.manual_seed(123) # For reproducibility due to the shuffling in the data loader
 
-        optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
+        optimizer = torch.optim.AdamW(model.parameters(), lr=self.config["learning_rate"], weight_decay=self.config["weight_decay"])
 
-        num_epochs = 10
         train_losses, val_losses, tokens_seen = self.train_model_simple(
             model, train_loader, val_loader, optimizer, device,
             num_epochs=self.config["num_epochs"], eval_freq=self.config["eval_freq"], eval_iter=self.config["eval_iter"],
